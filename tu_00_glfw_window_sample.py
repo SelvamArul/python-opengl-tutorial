@@ -1,9 +1,13 @@
-
 import glfw
 from OpenGL.GL import *  # pylint: disable=W0614
 from OpenGL.GLU import *  # pylint: disable=W0614
 
-import glm
+
+from pyrr import Quaternion, Matrix44, Vector3
+import numpy as np
+import math
+
+
 from utils.shaderLoader import Shader
 
 g_vertex_buffer_data = [
@@ -107,12 +111,12 @@ shader.initShaderFromGLSL(["glsl/tu01/vertex.glsl"],["glsl/tu01/fragment.glsl"])
 
 MVP_ID   = glGetUniformLocation(shader.program,"MVP")
 
-Projection = glm.perspective(glm.radians(45.0),800.0/480.0,0.1,100.0)
-View =  glm.lookAt(glm.vec3(4,3,-3), # Camera is at (4,3,-3), in World Space
-                glm.vec3(0,0,0), #and looks at the (0.0.0))
-                glm.vec3(0,1,0) ) #Head is up (set to 0,-1,0 to look upside-down)
+Projection = Matrix44.perspective_projection(math.radians(45.0),800.0/480.0,0.1,100.0)
+View =  Matrix44.look_at((4,3,-3), # Camera is at (4,3,-3), in World Space
+                (0,0,0), #and looks at the (0.0.0))
+                (0,1,0) ) #Head is up (set to 0,-1,0 to look upside-down)
 
-Model=  glm.mat4(1.0)
+Model =  Matrix44.identity()
 MVP =  Projection * View *Model
 #print context.MVP
 #exit(0)
@@ -132,8 +136,11 @@ while(True):
 
 	#shader.begin()
 	glUseProgram(shader.program)
-	glUniformMatrix4fv(MVP_ID,1,GL_FALSE,glm.value_ptr(MVP))
+	import ipdb; ipdb.set_trace()
+	glUniformMatrix4fv(MVP_ID,1,GL_FALSE, MVP)
 
+
+	# glEnableVertexAttribArray  
 	glEnableVertexAttribArray(0)
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer)
 

@@ -4,7 +4,10 @@
 
 from OpenGL.GL import *  # pylint: disable=W0614
 
-import glm
+from pyrr import Quaternion, Matrix44, Vector3
+import numpy as np
+import math
+
 from utils.glutWindow import GlutWindow
 from utils.shaderLoader import Shader
 
@@ -117,12 +120,12 @@ class Tu01Win(GlutWindow):
 
 	def calc_MVP(self,width=1920,height=1080):
 
-		self.context.Projection = glm.perspective(glm.radians(45.0),float(width)/float(height),0.1,1000.0)
-		self.context.View =  glm.lookAt(glm.vec3(4,3,-3), # Camera is at (4,3,-3), in World Space
-						glm.vec3(0,0,0), #and looks at the (0.0.0))
-						glm.vec3(0,1,0) ) #Head is up (set to 0,-1,0 to look upside-down)
+		self.context.Projection =Matrix44.perspective_projection(math.radians(45.0),float(width)/float(height),0.1,1000.0)
+		self.context.View =  Matrix44.look_at((4,3,-3), # Camera is at (4,3,-3), in World Space
+						(0,0,0), #and looks at the (0.0.0))
+						(0,1,0) ) #Head is up (set to 0,-1,0 to look upside-down)
 
-		self.context.Model=  glm.mat4(1.0)
+		self.context.Model=  Matrix44.identity()
 
 		self.context.MVP =  self.context.Projection * self.context.View * self.context.Model	
 
@@ -133,12 +136,12 @@ class Tu01Win(GlutWindow):
 
 	def ogl_draw(self):
 
-		print "draw++"
+		print ("draw++")
 		#print self.context.MVP
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 		self.shader.begin()
-		glUniformMatrix4fv(self.context.MVP_ID,1,GL_FALSE,glm.value_ptr(self.context.MVP))
+		glUniformMatrix4fv(self.context.MVP_ID,1,GL_FALSE, self.context.MVP)
 
 		glEnableVertexAttribArray(0)
 		glBindBuffer(GL_ARRAY_BUFFER, self.context.vertexbuffer)
